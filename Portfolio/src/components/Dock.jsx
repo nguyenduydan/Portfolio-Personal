@@ -20,7 +20,7 @@ function DockItem({
     children,
     className = "",
     onClick,
-    mouseX,
+    mouseY,
     spring,
     distance,
     magnification,
@@ -29,14 +29,16 @@ function DockItem({
     const ref = useRef(null);
     const isHovered = useMotionValue(0);
 
-    const mouseDistance = useTransform(mouseX, (val) => {
+    // ➜ Tính khoảng cách theo trục Y cho layout dọc
+    const mouseDistance = useTransform(mouseY, (val) => {
         const rect = ref.current?.getBoundingClientRect() ?? {
-            x: 0,
-            width: baseItemSize,
+            y: 0,
+            height: baseItemSize,
         };
-        return val - rect.x - baseItemSize / 2;
+        return val - rect.y - baseItemSize / 2;
     });
 
+    // ➜ Tạo hiệu ứng "wave"
     const targetSize = useTransform(
         mouseDistance,
         [-distance, 0, distance],
@@ -83,13 +85,12 @@ function DockLabel({ children, className = "", ...rest }) {
         <AnimatePresence>
             {isVisible && (
                 <motion.div
-                    initial={{ opacity: 0, y: 0 }}
-                    animate={{ opacity: 1, y: -10 }}
-                    exit={{ opacity: 0, y: 0 }}
+                    initial={{ opacity: 0, x: 0 }}
+                    animate={{ opacity: 1, x: -10 }}
+                    exit={{ opacity: 0, x: 0 }}
                     transition={{ duration: 0.2 }}
-                    className={`${className} absolute -top-6 left-1/2 w-fit whitespace-pre border border-neutral-700 bg-[#060010] px-2 py-0.5 text-md text-white`}
+                    className={`${className} absolute right-full top-1/2 -translate-y-1/2 mr-2 w-fit whitespace-pre border border-neutral-700 bg-[#060010] px-2 py-0.5 text-md text-white`}
                     role="tooltip"
-                    style={{ x: "-50%" }}
                 >
                     {children}
                 </motion.div>
@@ -112,11 +113,11 @@ export default function Dock({
     spring = { mass: 0.1, stiffness: 150, damping: 12 },
     magnification = 70,
     distance = 100,
-    panelHeight = 65,
-    dockHeight = 256,
+    panelHeight = 300,
+    dockHeight = 400,
     baseItemSize = 50,
 }) {
-    const mouseX = useMotionValue(Infinity);
+    const mouseY = useMotionValue(Infinity); // ➜ Đổi từ mouseX sang mouseY
     const isHovered = useMotionValue(0);
 
     const maxHeight = useMemo(
@@ -129,32 +130,31 @@ export default function Dock({
     return (
         <motion.div
             style={{ height, scrollbarWidth: "none" }}
-            className="mx-2 flex max-w-full items-center"
+            className="my-2 flex max-h-full"
         >
             <motion.div
-                onMouseMove={({ pageX }) => {
+                onMouseMove={({ pageY }) => {
                     isHovered.set(1);
-                    mouseX.set(pageX);
+                    mouseY.set(pageY);
                 }}
                 onMouseLeave={() => {
                     isHovered.set(0);
-                    mouseX.set(Infinity);
+                    mouseY.set(Infinity);
                 }}
-                className={`${className} absolute bottom-5 left-1/2 transform -translate-x-1/2 flex items-end w-fit gap-4
-              rounded-2xl border-neutral-700 border-2 pb-2 px-5
+                className={`${className} fixed right-5 top-1/2 transform -translate-y-1/2 flex flex-col items-center h-fit gap-4
+              rounded-2xl border-neutral-700 border-2 pt-5 pb-5 px-2
               backdrop-blur-md bg-white/10 dark:bg-gray-700/30
               shadow-xl ring-1 ring-white/10`}
-                style={{ height: panelHeight }}
+                style={{ width: baseItemSize + 20 }}
                 role="toolbar"
                 aria-label="Application dock"
             >
-
                 {items.map((item, index) => (
                     <DockItem
                         key={index}
                         onClick={item.onClick}
                         className={item.className}
-                        mouseX={mouseX}
+                        mouseY={mouseY}
                         spring={spring}
                         distance={distance}
                         magnification={magnification}
