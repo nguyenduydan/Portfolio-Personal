@@ -1,9 +1,7 @@
-import React, { useEffect, useState, memo } from "react";
-import FadeIn from "@components/FadeIn";
-import ZoomIn from "@components/ZoomIn";
-import { FiExternalLink as ExternalLink } from "react-icons/fi";
-import { motion } from "framer-motion";
-
+import React, { useEffect, useState, memo } from 'react';
+import FadeIn from '@components/FadeIn';
+import ZoomIn from '@components/ZoomIn'; // Nếu không có, thay bằng SlideIn hoặc FadeIn
+import { FiExternalLink as ExternalLink } from 'react-icons/fi';
 
 const ProjectCard = memo(({ project, index }) => {
     const [isHovered, setIsHovered] = useState(false);
@@ -11,37 +9,34 @@ const ProjectCard = memo(({ project, index }) => {
     return (
         <ZoomIn delay={index * 150}>
             <div
-                className="relative bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden group border border-gray-200 dark:border-gray-700"
+                className="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden group"
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
-                <div className="p-6 space-y-4">
-                    {/* Header */}
-                    <div className="flex justify-between items-start">
-                        <h3 className="text-xl font-semibold text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                <div className="p-6">
+                    <div className="flex justify-between items-start mb-4">
+                        <h3 className="text-xl font-bold text-gray-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
                             {project.name}
                         </h3>
                         <a
                             href={project.html_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition"
+                            className="p-2 text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300"
                         >
                             <ExternalLink className="w-5 h-5" />
                         </a>
                     </div>
 
-                    {/* Description */}
-                    <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
-                        {project.description || "No description provided."}
+                    <p className="text-gray-600 dark:text-gray-300 mb-4 leading-relaxed">
+                        {project.description || 'No description provided.'}
                     </p>
 
-                    {/* Tags & Language */}
-                    <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center justify-between">
                         <div className="flex flex-wrap gap-2">
                             {(project.topics?.length > 0
                                 ? project.topics.slice(0, 3)
-                                : [project.language || "General"]
+                                : [project.language || 'General']
                             ).map((tag) => (
                                 <span
                                     key={tag}
@@ -51,21 +46,16 @@ const ProjectCard = memo(({ project, index }) => {
                                 </span>
                             ))}
                         </div>
+
                         {project.language && (
-                            <span className="text-sm text-gray-500 dark:text-gray-400 italic">
+                            <span className="text-sm text-gray-500 dark:text-gray-400">
                                 {project.language}
                             </span>
                         )}
                     </div>
                 </div>
 
-                {/* Hover underline effect */}
-                <motion.div
-                    initial={{ scaleX: 0 }}
-                    animate={{ scaleX: isHovered ? 1 : 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-600 origin-left"
-                />
+                <div className={`h-1 bg-gradient-to-r from-blue-500 to-purple-600 transform origin-left transition-transform duration-300 ${isHovered ? 'scale-x-100' : 'scale-x-0'}`}></div>
             </div>
         </ZoomIn>
     );
@@ -78,25 +68,25 @@ const ProjectsSection = () => {
     useEffect(() => {
         const fetchRepos = async () => {
             try {
-                const res = await fetch(
-                    "https://api.github.com/users/nguyenduydan/repos?sort=updated&per_page=8",
+                const response = await fetch(
+                    'https://api.github.com/users/nguyenduydan/repos?sort=updated&per_page=8',
                     {
                         headers: {
-                            Accept: "application/vnd.github.mercy-preview+json",
+                            Accept: 'application/vnd.github.mercy-preview+json', // cần để lấy "topics"
                         },
                     }
                 );
-                const data = await res.json();
+
+                const data = await response.json();
+
                 const filtered = data
                     .filter((repo) => !repo.private && repo.description)
-                    .sort(
-                        (a, b) =>
-                            new Date(b.created_at) - new Date(a.created_at)
-                    );
+                    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
+                console.log('Fetched Repositories:', filtered);
                 setRepos(filtered);
-            } catch (err) {
-                console.error("Failed to fetch repos:", err);
+            } catch (error) {
+                console.error('Error fetching GitHub repositories:', error);
             } finally {
                 setLoading(false);
             }
@@ -106,7 +96,7 @@ const ProjectsSection = () => {
     }, []);
 
     return (
-        <section id="projects" className="py-20 bg-white dark:bg-gray-900">
+        <section id="projects" className="py-20 bg-white dark:bg-gray-800">
             <div className="max-w-6xl mx-auto px-6">
                 <FadeIn>
                     <h2 className="text-4xl md:text-5xl font-bold text-center mb-16 text-gray-800 dark:text-white">
@@ -119,13 +109,9 @@ const ProjectsSection = () => {
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
                     </div>
                 ) : (
-                    <div className="grid sm:grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-2 gap-8">
                         {repos.map((project, index) => (
-                            <ProjectCard
-                                key={project.id}
-                                project={project}
-                                index={index}
-                            />
+                            <ProjectCard key={project.id} project={project} index={index} />
                         ))}
                     </div>
                 )}

@@ -47,7 +47,7 @@ function App() {
       <div className="fixed bottom-0 left-0 right-0 flex justify-center z-40">
         <Dock
           items={items}
-          panelHeight={50}
+          panelHeight={200}
           baseItemSize={40}
           magnification={60}
           className=" dark:bg-white/10 backdrop-blur-md border border-white/10 shadow-lg px-2 cursor-pointer rounded-lg"

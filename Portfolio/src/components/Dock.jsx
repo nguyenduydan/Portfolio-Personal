@@ -113,58 +113,44 @@ export default function Dock({
     spring = { mass: 0.1, stiffness: 150, damping: 12 },
     magnification = 70,
     distance = 100,
-    panelHeight = 300,
-    dockHeight = 400,
     baseItemSize = 50,
 }) {
-    const mouseY = useMotionValue(Infinity); // ➜ Đổi từ mouseX sang mouseY
+    const mouseY = useMotionValue(Infinity);
     const isHovered = useMotionValue(0);
-
-    const maxHeight = useMemo(
-        () => Math.max(dockHeight, magnification + magnification / 2 + 4),
-        [magnification, dockHeight]
-    );
-    const heightRow = useTransform(isHovered, [0, 1], [panelHeight, maxHeight]);
-    const height = useSpring(heightRow, spring);
 
     return (
         <motion.div
-            style={{ height, scrollbarWidth: "none" }}
-            className="my-2 flex max-h-full"
-        >
-            <motion.div
-                onMouseMove={({ pageY }) => {
-                    isHovered.set(1);
-                    mouseY.set(pageY);
-                }}
-                onMouseLeave={() => {
-                    isHovered.set(0);
-                    mouseY.set(Infinity);
-                }}
-                className={`${className} fixed right-5 top-1/2 transform -translate-y-1/2 flex flex-col items-center h-fit gap-4
+            onMouseMove={(e) => {
+                isHovered.set(1);
+                mouseY.set(e.clientY);
+            }}
+            onMouseLeave={() => {
+                isHovered.set(0);
+                mouseY.set(Infinity);
+            }}
+            className={`${className} fixed right-5 top-1/2 -translate-y-1/2 flex flex-col items-center h-fit gap-4
               rounded-2xl border-neutral-700 border-2 pt-5 pb-5 px-2
               backdrop-blur-md bg-white/10 dark:bg-gray-700/30
-              shadow-xl ring-1 ring-white/10`}
-                style={{ width: baseItemSize + 20 }}
-                role="toolbar"
-                aria-label="Application dock"
-            >
-                {items.map((item, index) => (
-                    <DockItem
-                        key={index}
-                        onClick={item.onClick}
-                        className={item.className}
-                        mouseY={mouseY}
-                        spring={spring}
-                        distance={distance}
-                        magnification={magnification}
-                        baseItemSize={baseItemSize}
-                    >
-                        <DockIcon>{item.icon}</DockIcon>
-                        <DockLabel>{item.label}</DockLabel>
-                    </DockItem>
-                ))}
-            </motion.div>
+              shadow-xl ring-1 ring-white/10 z-50`}
+            style={{ width: baseItemSize + 20 }}
+            role="toolbar"
+            aria-label="Application dock"
+        >
+            {items.map((item, index) => (
+                <DockItem
+                    key={index}
+                    onClick={item.onClick}
+                    className={item.className}
+                    mouseY={mouseY}
+                    spring={spring}
+                    distance={distance}
+                    magnification={magnification}
+                    baseItemSize={baseItemSize}
+                >
+                    <DockIcon>{item.icon}</DockIcon>
+                    <DockLabel>{item.label}</DockLabel>
+                </DockItem>
+            ))}
         </motion.div>
     );
 }
