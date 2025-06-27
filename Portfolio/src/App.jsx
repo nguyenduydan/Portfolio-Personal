@@ -2,8 +2,7 @@ import React from 'react';
 import useDarkMode from '@hooks/useDarkMode';
 import Footer from '@components/Footer';
 import Dock from '@components/Dock';
-import { GoHome, GoArchive, GoPerson, GoGear, GoMegaphone } from "react-icons/go";
-import { BsSun, BsMoon } from "react-icons/bs";
+import { FcHome, FcContacts, FcPortraitMode, FcWorkflow, FcOpenedFolder } from "react-icons/fc";
 
 import AboutSection from './components/Sections/About';
 import HeroSection from './components/Sections/Hero';
@@ -22,11 +21,11 @@ function App() {
   };
 
   const items = [
-    { icon: <GoHome size={18} />, label: 'Home', onClick: () => scrollToSection('home') },
-    { icon: <GoPerson size={18} />, label: 'About', onClick: () => scrollToSection('about') },
-    { icon: <GoGear size={18} />, label: 'skills', onClick: () => scrollToSection('skills') },
-    { icon: <GoArchive size={18} />, label: 'Projects', onClick: () => scrollToSection('projects') },
-    { icon: <GoMegaphone size={18} />, label: 'Contact', onClick: () => scrollToSection('contact') },
+    { icon: <FcHome size={18} />, label: 'Home', onClick: () => scrollToSection('home') },
+    { icon: <FcPortraitMode size={18} />, label: 'About', onClick: () => scrollToSection('about') },
+    { icon: <FcWorkflow size={18} />, label: 'skills', onClick: () => scrollToSection('skills') },
+    { icon: <FcOpenedFolder size={18} />, label: 'Projects', onClick: () => scrollToSection('projects') },
+    { icon: <FcContacts size={18} />, label: 'Contact', onClick: () => scrollToSection('contact') },
   ];
 
 
