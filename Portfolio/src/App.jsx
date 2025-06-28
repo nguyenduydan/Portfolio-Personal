@@ -34,7 +34,7 @@ function App() {
 
   return (
     <div className="relative min-h-screen w-full bg-white dark:bg-gray-900 transition-colors duration-300 text-gray-900 dark:text-white flex flex-col justify-between">
-      <Toaster position="top-center" reverseOrder={false} />;
+      <Toaster position="top-center" reverseOrder={false} />
       {/* Main Section */}
       <main className="w-full max-w-6xl mx-auto px-4 pt-24 pb-36">
         {/* Add sections here: About, Skills, Projects, etc. */}
