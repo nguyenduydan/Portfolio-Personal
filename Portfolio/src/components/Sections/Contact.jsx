@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import FadeIn from '@components/FadeIn';
 import SlideIn from '@components/Slide';
 import { FaEnvelope, FaGithub, FaLinkedin } from 'react-icons/fa';
+import emailjs from 'emailjs-com';
+import toast from 'react-hot-toast';
 
 const ContactSection = () => {
     const [formData, setFormData] = useState({
@@ -9,17 +11,42 @@ const ContactSection = () => {
         email: '',
         message: ''
     });
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleSubmit = () => {
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
         if (!formData.name.trim() || !formData.email.trim() || !formData.message.trim()) {
-            alert('Please fill in all fields');
+            toast.error('Please fill in all fields');
             return;
         }
 
-        console.log('Form submitted:', formData);
-        alert("Thank you for your message! I'll get back to you soon.");
-        setFormData({ name: '', email: '', message: '' });
+        setIsLoading(true);
+
+        const serviceID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+        const templateID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+        const userID = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+        const templateParams = {
+            title: `New Contact Form Submission - ${formData.name}`,
+            name: formData.name,
+            from_email: formData.email,
+            message: formData.message,
+            time: new Date().toLocaleString('en-US', { timeZone: 'Asia/Ho_Chi_Minh' })
+        };
+
+        try {
+            await emailjs.send(serviceID, templateID, templateParams, userID);
+            toast.success("Message sent successfully!");
+            setFormData({ name: '', email: '', message: '' });
+        } catch (error) {
+            console.error('EmailJS Error:', error);
+            toast.error('Failed to send the message. Please try again later.');
+        } finally {
+            setIsLoading(false);
+        }
     };
+
 
     const handleChange = (e) => {
         setFormData({
@@ -53,7 +80,7 @@ const ContactSection = () => {
                             <div className="space-y-4">
                                 <a href="mailto:contact@example.com" className="flex items-center space-x-3 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300 cursor-pointer">
                                     <FaEnvelope className="w-5 h-5" />
-                                    <span>contact@example.com</span>
+                                    <span>duydan.cv@gmail.com</span>
                                 </a>
                                 <a href="https://github.com/nguyenduydan" className="flex items-center space-x-3 text-gray-600 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-300 cursor-pointer">
                                     <FaGithub className="w-5 h-5" />
@@ -95,9 +122,13 @@ const ContactSection = () => {
                             ></textarea>
                             <button
                                 onClick={handleSubmit}
-                                className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold hover:from-blue-700 hover:to-purple-700 transition-all duration-300 transform hover:scale-105"
+                                disabled={isLoading}
+                                className={`w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-semibold
+                                ${isLoading ? 'opacity-60 cursor-not-allowed' : 'hover:from-blue-700 hover:to-purple-700 hover:scale-105'}
+                                transition-all duration-300 transform`}
+                                type='submit'
                             >
-                                Send Message
+                                {isLoading ? 'Sending...' : 'Send Message'}
                             </button>
                         </div>
                     </SlideIn>
